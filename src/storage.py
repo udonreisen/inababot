@@ -97,8 +97,8 @@ class Storage(object):
         session = Session()
         jid = session.query(Jid).filter(Jid.jid == ijid).first()
         if jid is None:
-            user = Jid(Jid)
-            session.add(ijid)
+            jid = Jid(ijid)
+            session.add(jid)
             session.commit()
         nick = session.query(Nick).filter(Nick.nick == inick).first()
         if jid is None:
