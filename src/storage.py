@@ -95,9 +95,16 @@ class Storage(object):
 #Сообщения
     def addMessage(self, room, ijid, inick, message):
         session = Session()
-        muc = session.query(MUC).filter(MUC.jid == room).first()
         jid = session.query(Jid).filter(Jid.jid == ijid).first()
+        if jid is None:
+            user = Jid(Jid)
+            session.add(ijid)
+            session.commit()
         nick = session.query(Nick).filter(Nick.nick == inick).first()
+        if jid is None:
+            user = Nick(inick)
+            session.add(jid)
+        muc = session.query(MUC).filter(MUC.jid == room).first()
         if muc is not None:
             msg = Message(jid.id, muc.id, nick.id, message)
             session.add(msg)

@@ -102,7 +102,7 @@ class HelpCommand(Command):
 !memb — делает участника постояным
 !part — подсвечивает всех участников в конференци
 !ping — pong!
-!roll — рулетка с фильмами (только для модераторов)'''.format(nick)
+!roll — рулетка с фильмами'''.format(nick)
         self.say(room, reply)
 
 class MembCommand(Command):
@@ -137,11 +137,10 @@ class PingCommand(Command):
 # Команда выбора фильма
 class RollCommand(Command):
     def __call__(self, room, nick, argstring=None):
-        if nick in self.bot.moderators[room]:
-            films = list(self.bot.storage.listFilms(False))
-            if films:
-                film = self.randList(films)
-                reply = '{0}, выбранный фильм: {1}'.format(nick, film)
-            else:
-                reply = '{0}, ничего не выбранно!'.format(nick)
-            self.say(room, reply)
+        films = list(self.bot.storage.listFilms(False))
+        if films:
+            film = self.randList(films)
+            reply = '{0}, выбранный фильм: {1}'.format(nick, film)
+        else:
+            reply = '{0}, ничего не выбранно!'.format(nick)
+        self.say(room, reply)
