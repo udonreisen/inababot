@@ -15,24 +15,22 @@ import logic
 class XmppBot:
     def __init__(self, jid, password, owner):
         self.xmpp = sleekxmpp.ClientXMPP(jid, password)
-        self.pluginList = ['xep_0030', 'xep_0045', 'xep_0199']
-        for plugin in self.pluginList:
-            self.xmpp.registerPlugin(plugin)
-        self.xmpp.plugin['xep_0199'].config['frequency'] = 60
+        self.xmpp.registerPlugin('xep_0030')
+        self.xmpp.registerPlugin('xep_0045')
+        self.xmpp.registerPlugin('xep_0199', {'keepalive': True,
+                                              'frequency': 60,
+                                              'timeout'  : 10})
         self.xmpp.add_event_handler('session_start', self.handleXMPPConnected)
         self.xmpp.add_event_handler('message', self.handleIncomingMessage)
         self.xmpp.add_event_handler('groupchat_message', self.handleIncomingGroupMessage)
         self.xmpp.add_event_handler('groupchat_presence', self.handleIncomingGroupPresence)
         self.storage = Storage()
-
         self.myNicks = {}
         self.users = {}
         self.online = {}
         self.moderators = {}
-
         self.commands = logic.commands_list
         self.controls = logic.controls_list
-
         self.urls = []
 
     # Запуск бота
@@ -42,12 +40,13 @@ class XmppBot:
 
     # Обработчик события подключения к серверу
     def handleXMPPConnected(self, event):
-        self.xmpp.sendPresence()
+        self.xmpp.sendPresence(ppriority=99, pshow='chat')
         for muc in self.storage.getAutoMUC():
             self.myNicks[muc.jid] = muc.nick
             self.joinMUC(muc.jid, muc.nick)
             self.users[muc.jid] = {}
             self.moderators[muc.jid] = []
+        self.hello()
 
     # Обработка статусных сообщений
     def handleIncomingGroupPresence(self, presence):
@@ -109,16 +108,16 @@ class XmppBot:
 
     # Подключение к конференции
     def joinMUC(self, room, nick):
-        self.xmpp.plugin['xep_0045'].joinMUC(room, nick)
-#        self.hello(room)
+        self.xmpp.plugin['xep_0045'].joinMUC(room, nick,  pshow='chat')
 
     # Приветствие
-    def hello(self, room):
+    def hello(self):
         time.sleep(5)
         members = ['няшечки', 'сырны', 'ычаньки', 'бетманы']
-        asks = ['всё няшитесь', 'всё спите', 'всё ругаетесь']
-        text = 'Ну что вы, {0}, {1}?'.format(random.choice(members), random.choice(asks))
-        self.xmpp.sendMessage(room, text, mtype='groupchat')
+        asks = ['всё няшитесь', 'всё ругаетесь', 'всё спите']
+        for room in self.xmpp.plugin['xep_0045'].get_joined_rooms():
+            text = 'Ну что вы, {0}, {1}?'.format(random.choice(members), random.choice(asks))
+            self.xmpp.sendMessage(room, text, mtype='groupchat')
 
     # Даёт голос гостям
     def autoVoice(self, room, nick):

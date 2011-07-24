@@ -108,16 +108,11 @@ class HelpCommand(Command):
 class MembCommand(Command):
     def __call__(self, room, nick, argstring=None):
         if self.bot.users[room][nick]['affiliation'] not in ['owner','admin','member']:
-            query = cElementTree.Element('{http://jabber.org/protocol/muc#admin}query')
-            item = cElementTree.Element('item', {'affiliation':'member', 'nick':nick})
-            query.append(item)
-            iq = self.bot.xmpp.makeIqSet(query)
-            iq['to'] = room
-            if iq.send():
-                time.sleep(2)
-                reply = 'Добро пожаловать в нашу секту, {0} :3'.format(nick)
+            self.bot.xmpp.plugin['xep_0045'].set_affiliation(room, nick=nick)
+            reply = 'Добро пожаловать в нашу секту, {0} :3'.format(nick)
         else:
             reply = '{0}, ты же и так с нами!'.format(nick)
+        time.sleep(2)
         self.say(room, reply)
 
 # Хайлайтит всех участников конференции
@@ -132,7 +127,9 @@ class PartCommand(Command):
 # Простая команда для проверки
 class PingCommand(Command):
     def __call__(self, room, nick, argstring=None):
-        self.say (room, '{0}: pong!'.format(nick))
+        jid = self.bot.users[room][nick]['jid']
+        delay = self.bot.xmpp.plugin['xep_0199'].send_ping(jid)
+        self.say (room, '{0}: pong! Задержка {1} с.'.format(nick, str(delay)[0:5]))
 
 # Команда выбора фильма
 class RollCommand(Command):

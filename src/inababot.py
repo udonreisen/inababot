@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python -OO
 # inababot/src/inababot.py
 #
 # Copyright (C) 2011 - Reisen Udonge
