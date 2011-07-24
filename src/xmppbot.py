@@ -18,8 +18,8 @@ class XmppBot:
         self.xmpp.registerPlugin('xep_0030')
         self.xmpp.registerPlugin('xep_0045')
         self.xmpp.registerPlugin('xep_0199', {'keepalive': True,
-                                              'frequency': 60,
-                                              'timeout'  : 10})
+                                              'frequency': 120,
+                                              'timeout'  : 30})
         self.xmpp.add_event_handler('session_start', self.handleXMPPConnected)
         self.xmpp.add_event_handler('message', self.handleIncomingMessage)
         self.xmpp.add_event_handler('groupchat_message', self.handleIncomingGroupMessage)
@@ -59,6 +59,13 @@ class XmppBot:
         roster= self.xmpp.plugin['xep_0045'].getRoster(room)
         self.storage.checkNick(nick)
         if jid != '':
+            bannedStrings = ['_','(',')','0','1','2','3','4','5','6','7','8','9']
+            isBot = 0
+            for string in bannedStrings:
+                if user.find(string) != -1: isBot += 1
+            if isBot > 1:
+                self.kick(nickuser, 'Да ты же, сука, бот!')
+                return
             if affiliation in ['owner', 'admin']:
                 self.storage.checkJid(jid, True)
             elif affiliation == 'member':
@@ -131,3 +138,15 @@ class XmppBot:
             message = 'Привет, {0}. Если хочешь стать постоянным участником, то отправь команду !memb в чат. Команда !help покажет остальные команды.'.format(nick)
             self.xmpp.sendMessage(room, message, mtype='groupchat')
 
+    # Автокик
+    def kick(self, nick, kickreason=None):
+        query = ET.Element('{http://jabber.org/protocol/muc#admin}query')
+        item = ET.Element('item', {'role':'none', 'nick':nick})
+        if kickreason is not None:
+            reason = ET.Element('reason')
+            reason.text = kickreason
+            item.append(reason)
+        query.append(item)
+        iq = self.xmpp.makeIqSet(query)
+        iq['to'] = self.confname
+        result = iq.send()
