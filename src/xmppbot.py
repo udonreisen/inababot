@@ -62,9 +62,9 @@ class XmppBot:
             bannedStrings = ['_','(',')','0','1','2','3','4','5','6','7','8','9']
             isBot = 0
             for string in bannedStrings:
-                if user.find(string) != -1: isBot += 1
+                if nick.find(string) != -1: isBot += 1
             if isBot > 1:
-                self.kick(nickuser, 'Да ты же, сука, бот!')
+                self.kick(nick, 'Да ты же, сука, бот!')
                 return
             if affiliation in ['owner', 'admin']:
                 self.storage.checkJid(jid, True)
