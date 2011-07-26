@@ -8,13 +8,11 @@ controls_list = {
     'muc'        : MUCControl,
 }
 
-commands_list = {
-    '!film'     : FilmCommand,
-    '!help'     : HelpCommand,
-    '!memb'     : MembCommand,
-    '!part'     : PartCommand,
-    '!ping'     : PingCommand,
-    '!roll'     : RollCommand
+commands_list = {'!infa': InfaCommand,
+                 '!help': HelpCommand,
+                 '!memb': MembCommand,
+                 '!part': PartCommand,
+                 '!ping': PingCommand,
 }
 
 admin_commands_list = {

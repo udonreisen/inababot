@@ -59,6 +59,13 @@ class XmppBot:
         roster= self.xmpp.plugin['xep_0045'].getRoster(room)
         self.storage.checkNick(nick)
         if jid != '':
+            bannedStrings = ['_','(',')','0','1','2','3','4','5','6','7','8','9']
+            isBot = 0
+            for string in bannedStrings:
+                if nick.find(string) != -1: isBot += 1
+            if isBot > 1:
+                self.kick(nick, 'Да ты же, сука, бот!')
+                return
             if affiliation in ['owner', 'admin']:
                 self.storage.checkJid(jid, True)
             elif affiliation == 'member':
@@ -86,10 +93,9 @@ class XmppBot:
                 command = text.split(' ', 1)[0]
                 argstring = text.split(' ', 1)[1]
                 comm = Thread(target=logic.commands_list[command](self), args=(room, nick, argstring))
-                comm.start()
             elif text in logic.commands_list:
                 comm = Thread(target=logic.commands_list[text](self), args=(room, nick))
-                comm.start()
+            comm.start()
         elif nick != '':
             jid = self.users[room][nick]['jid']
             self.storage.addMessage(room, jid, nick, text)
@@ -133,14 +139,14 @@ class XmppBot:
             self.xmpp.sendMessage(room, message, mtype='groupchat')
 
     # Автокик
-    def kick(self, nick, room, kickreason=None):
-        query = cElementTree.Element('{http://jabber.org/protocol/muc#admin}query')
-        item = cElementTree.Element('item', {'role':'none', 'nick':nick})
+    def kick(self, nick, kickreason=None):
+        query = ET.Element('{http://jabber.org/protocol/muc#admin}query')
+        item = ET.Element('item', {'role':'none', 'nick':nick})
         if kickreason is not None:
-            reason = cElementTree.Element('reason')
+            reason = ET.Element('reason')
             reason.text = kickreason
             item.append(reason)
         query.append(item)
         iq = self.xmpp.makeIqSet(query)
-        iq['to'] = room
+        iq['to'] = self.confname
         result = iq.send()
