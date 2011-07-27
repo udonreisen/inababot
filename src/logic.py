@@ -23,5 +23,5 @@ admin_commands_list = {
 #    '!kick'     : KickCommand
 }
 
-def textHandle(self, nick, my_nick, text):
+def textHandle(nick, my_nick, text):
     return

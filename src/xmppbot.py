@@ -46,7 +46,7 @@ class XmppBot:
             self.joinMUC(muc.jid, muc.nick)
             self.users[muc.jid] = {}
             self.moderators[muc.jid] = []
-        self.hello()
+#        self.hello()
 
     # Обработка статусных сообщений
     def handleIncomingGroupPresence(self, presence):
@@ -91,17 +91,19 @@ class XmppBot:
         if nick:
             jid = self.users[room][nick]['jid']
             self.storage.addMessage(room, jid, nick, text)
-        elif text.startswith(tuple(logic.commands_list)):
+            if nick != self.myNicks[room]:
+                reply = logic.textHandle(nick, self.myNicks[room], text)
+                if reply: self.sayInMUC(room, reply)
+        if text.startswith(tuple(logic.commands_list)):
             if text.count(' ') > 0:
                 command = text.split(' ', 1)[0]
                 argstring = text.split(' ', 1)[1]
                 comm = Thread(target=logic.commands_list[command](self), args=(room, nick, argstring))
+                comm.start()
             elif text in logic.commands_list:
                 comm = Thread(target=logic.commands_list[text](self), args=(room, nick))
-            comm.start()
-        if nick != self.myNicks[room]:
-            reply = textHandle(nick, self.myNicks[room], text)
-            if reply: self.sayInMUC(room, reply)
+                comm.start()
+
 
     # Обработка сообщений
     def handleIncomingMessage(self, message):
