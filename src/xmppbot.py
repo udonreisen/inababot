@@ -88,7 +88,10 @@ class XmppBot:
         nick = message['mucnick']
         text = message['body']
         print('{0}/{1}: {2}'.format(room, nick, text))
-        if text.startswith(tuple(logic.commands_list)):
+        if nick:
+            jid = self.users[room][nick]['jid']
+            self.storage.addMessage(room, jid, nick, text)
+        elif text.startswith(tuple(logic.commands_list)):
             if text.count(' ') > 0:
                 command = text.split(' ', 1)[0]
                 argstring = text.split(' ', 1)[1]
@@ -96,9 +99,9 @@ class XmppBot:
             elif text in logic.commands_list:
                 comm = Thread(target=logic.commands_list[text](self), args=(room, nick))
             comm.start()
-        elif nick != '':
-            jid = self.users[room][nick]['jid']
-            self.storage.addMessage(room, jid, nick, text)
+        if nick != self.myNicks[room]:
+            reply = textHandle(nick, self.myNicks[room], text)
+            if reply: self.sayInMUC(room, reply)
 
     # Обработка сообщений
     def handleIncomingMessage(self, message):
@@ -116,6 +119,9 @@ class XmppBot:
     # Подключение к конференции
     def joinMUC(self, room, nick):
         self.xmpp.plugin['xep_0045'].joinMUC(room, nick,  pshow='chat')
+
+    def sayInMUC(self, room, text):
+        self.xmpp.sendMessage(room, text, mtype='groupchat')
 
     # Приветствие
     def hello(self):
@@ -135,8 +141,8 @@ class XmppBot:
         iq['to'] = room
         time.sleep(15)
         if iq.send():
-            message = 'Привет, {0}. Если хочешь стать постоянным участником, то отправь команду !memb в чат. Команда !help покажет остальные команды.'.format(nick)
-            self.xmpp.sendMessage(room, message, mtype='groupchat')
+            reply = 'Привет, {0}. Если хочешь стать постоянным участником, то отправь команду !memb в чат. Команда !help покажет остальные команды.'.format(nick)
+            self.sayInMUC(room, reply)
 
     # Автокик
     def kick(self, nick, kickreason=None):

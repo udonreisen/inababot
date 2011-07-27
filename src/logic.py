@@ -1,6 +1,8 @@
 # logic.py
 #
 
+import re
+
 from controls import *
 from commands import *
 
@@ -20,3 +22,6 @@ admin_commands_list = {
 #    '!devoice'  : DevoiceCommand,
 #    '!kick'     : KickCommand
 }
+
+def textHandle(self, nick, my_nick, text):
+    return
