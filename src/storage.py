@@ -103,7 +103,7 @@ class Storage(object):
         nick = session.query(Nick).filter(Nick.nick == inick).first()
         if nick is None:
             user = Nick(inick)
-            session.add(jid)
+            session.add(user)
         muc = session.query(MUC).filter(MUC.jid == room).first()
         if muc is not None:
             msg = Message(jid.id, muc.id, nick.id, message)
