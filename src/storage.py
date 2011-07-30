@@ -101,7 +101,7 @@ class Storage(object):
             session.add(jid)
             session.commit()
         nick = session.query(Nick).filter(Nick.nick == inick).first()
-        if jid is None:
+        if nick is None:
             user = Nick(inick)
             session.add(jid)
         muc = session.query(MUC).filter(MUC.jid == room).first()

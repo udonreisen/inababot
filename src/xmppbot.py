@@ -56,7 +56,7 @@ class XmppBot:
         nick = presence['muc']['nick']
         affiliation = presence['muc']['affiliation']
         role = presence['muc']['role']
-        jid = presence['muc']['jid'].bare
+        jid = presence['muc']['jid'].bare.lower()
         type = presence['muc']['type']
         roster= self.xmpp.plugin['xep_0045'].getRoster(room)
         self.storage.checkNick(nick)
@@ -124,17 +124,18 @@ class XmppBot:
     def joinMUC(self, room, nick):
         self.xmpp.plugin['xep_0045'].joinMUC(room, nick,  pshow='chat')
 
+    # Отправляет сообщение в конференцию
     def sayInMUC(self, room, text):
         self.xmpp.sendMessage(room, text, mtype='groupchat')
 
     # Приветствие
     def hello(self):
         time.sleep(5)
-        members = ['няшечки', 'сырны', 'ычаньки', 'бетманы']
-        asks = ['всё няшитесь', 'всё ругаетесь', 'всё спите']
+        members = ['бетманы', 'няшки', 'омичи']
+        asks = ['всё няшитесь', 'всё ругаетесь', 'всё спите','всё упарываетесь']
         for room in self.xmpp.plugin['xep_0045'].get_joined_rooms():
             text = 'Ну что вы, {0}, {1}?'.format(random.choice(members), random.choice(asks))
-            self.xmpp.sendMessage(room, text, mtype='groupchat')
+            self.sayInMUC(room, text)
 
     # Даёт голос гостям
     def autoVoice(self, room, nick):
