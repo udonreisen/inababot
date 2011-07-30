@@ -27,7 +27,7 @@ class XmppBot:
         self.storage = Storage()
         self.myNicks = {}
         self.users = {}
-        self.online = {}
+        self.online = False
         self.moderators = {}
         self.commands = logic.commands_list
         self.controls = logic.controls_list
@@ -46,7 +46,9 @@ class XmppBot:
             self.joinMUC(muc.jid, muc.nick)
             self.users[muc.jid] = {}
             self.moderators[muc.jid] = []
-#        self.hello()
+        if not self.online:
+            self.online = True
+            self.hello()
 
     # Обработка статусных сообщений
     def handleIncomingGroupPresence(self, presence):

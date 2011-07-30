@@ -63,8 +63,7 @@ class HelpCommand(Command):
 !help — данная справка
 !memb — делает участника постояным
 !part — подсвечивает всех участников в конференци
-!ping — pong!
-!roll — рулетка с фильмами'''.format(nick)
+!ping — pong!'''.format(nick)
         self.say(room, reply)
 
 class MembCommand(Command):
@@ -90,6 +89,8 @@ class PartCommand(Command):
 class PingCommand(Command):
     def __call__(self, room, nick, argstring=None):
         jid = self.bot.users[room][nick]['jid']
-        delay = self.bot.xmpp.plugin['xep_0199'].send_ping(jid)
-        self.say (room, '{0}: pong! Задержка {1} с.'.format(nick, str(delay)[0:5]))
+        if self.bot.xmpp.plugin['xep_0199'].send_ping(jid):
+            self.say(room, '{0}: pong!'.format(nick))
+        else:
+            self.say(room, '{0}: No more pongs for you...'.format(nick))
 
