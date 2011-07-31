@@ -108,7 +108,6 @@ class FilmCommand(Command):
     def help(self):
         return '''{0}: Использование:
 !film help — данная справка;
-!film curr — выбранный фильм и време начала;
 !film list — список фильмов участвующих в рулетке;
 !film full — полный список фильмов;
 !film add Название Фильма — добавить фильм;
