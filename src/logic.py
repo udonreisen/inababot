@@ -10,11 +10,13 @@ controls_list = {
     'muc'        : MUCControl,
 }
 
-commands_list = {'!infa': InfaCommand,
+commands_list = {'!film': FilmCommand,
+                 '!infa': InfaCommand,
                  '!help': HelpCommand,
                  '!memb': MembCommand,
                  '!part': PartCommand,
                  '!ping': PingCommand,
+                 '!roll': RollCommand
 }
 
 admin_commands_list = {

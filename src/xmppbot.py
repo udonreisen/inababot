@@ -56,7 +56,7 @@ class XmppBot:
         nick = presence['muc']['nick']
         affiliation = presence['muc']['affiliation']
         role = presence['muc']['role']
-        jid = presence['muc']['jid'].bare.lower()
+        jid = presence['muc']['jid'].bare
         type = presence['muc']['type']
         roster= self.xmpp.plugin['xep_0045'].getRoster(room)
         self.storage.checkNick(nick)
@@ -106,7 +106,6 @@ class XmppBot:
                 comm = Thread(target=logic.commands_list[text](self), args=(room, nick))
                 comm.start()
 
-
     # Обработка сообщений
     def handleIncomingMessage(self, message):
         jid = message['from'].bare
@@ -151,10 +150,10 @@ class XmppBot:
 
     # Автокик
     def kick(self, nick, kickreason=None):
-        query = ET.Element('{http://jabber.org/protocol/muc#admin}query')
-        item = ET.Element('item', {'role':'none', 'nick':nick})
+        query = cElementTree.Element('{http://jabber.org/protocol/muc#admin}query')
+        item = cElementTree.Element('item', {'role':'none', 'nick':nick})
         if kickreason is not None:
-            reason = ET.Element('reason')
+            reason = cElementTree.Element('reason')
             reason.text = kickreason
             item.append(reason)
         query.append(item)
