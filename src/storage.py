@@ -123,12 +123,12 @@ class Storage(object):
             film = session.query(Film).filter(Film.id == settings.film).first()
         session.close()
         return film
-    def listFilms(self, all):
+    def listFilms(self, roll):
         session = Session()
-        films = []
-        for film in session.query(Film).order_by(Film.id):
-            if film.roll or all:
-                films.append('{0}. «{1}»'.format(film.id, film.title))
+        if roll:
+            films = session.query(Film).filter(Film.roll == True).order_by(Film.id)
+        else:
+            films = session.query(Film).order_by(Film.id)
         session.close()
         return films
     def addFilm(self, title):
@@ -148,7 +148,7 @@ class Storage(object):
         if film is not None:
             film.roll = roll
             session.commit()
-        return film.title
+            return film.title
     def remFilm(self, id):
         session = Session()
         film = session.query(Film).filter(Film.id == id).first()
@@ -161,7 +161,7 @@ class Storage(object):
             return False
     def clearFilm(self):
         session = Session()
-        films = session.query(Film).filter(True).all()
+        films = session.query(Film).order_by(Film.id)
         if films is not None:
             session.delete(films)
             session.commit()

@@ -52,14 +52,19 @@ class FilmCommand(Command):
         if argstring is None or argstring.startswith('help'):
             self.say(room, self.help().format(nick))
         elif argstring.startswith('list'):
-            listFilms = list(self.bot.storage.listFilms(False))
+            listFilms = []
+            for film in list(self.bot.storage.listFilms(True)):
+                if film.roll:
+                    listFilms.append('{0}. «{1}»'.format(film.id, film.title))
             if listFilms:
                 reply = '{0}, список фильмов в рулетке: {1}'.format(nick, ', '.join(listFilms))
             else:
                 reply = '{0}, фильмов в рулетке нет.'.format(nick)
             self.say(room, reply)
         elif argstring.startswith('full'):
-            listFilms = list(self.bot.storage.listFilms(True))
+            listFilms = []
+            for film in list(self.bot.storage.listFilms(False)):
+                listFilms.append('{0}. «{1}»'.format(film.id, film.title))
             if listFilms:
                 reply = '{0}, весь список фильмов: {1}'.format(nick, ', '.join(listFilms))
             else:
@@ -86,10 +91,13 @@ class FilmCommand(Command):
                 return
             if filmID.isdigit():
                 film = self.bot.storage.switchFilm(filmID, onRollete)
-                if onRollete:
-                    reply = '{0}, фильм «{1}» участвует в рулетке!'.format(nick, film)
+                if film:
+                    if onRollete:
+                        reply = '{0}, фильм «{1}» участвует в рулетке!'.format(nick, film)
+                    else:
+                        reply = '{0}, фильм «{1}» не участвует в рулетке!'.format(nick, film)
                 else:
-                    reply = '{0}, фильм «{1}» не участвует в рулетке!'.format(nick, film)
+                    reply = '{0}, неправильный ID!'.format(nick)
                 self.say(room, reply)
             else:
                 self.say(room, self.help().format(nick))
@@ -174,10 +182,11 @@ class PingCommand(Command):
 # Команда выбора фильма
 class RollCommand(Command):
     def __call__(self, room, nick, argstring=None):
-        films = list(self.bot.storage.listFilms(False))
+        films = list(self.bot.storage.listFilms(True))
         if films:
             film = self.randList(films)
-            reply = '{0}, выбранный фильм: {1}'.format(nick, film)
+            title = self.bot.storage.switchFilm(film.id, False)
+            reply = '{0}, выбранный фильм: {1}. «{2}»'.format(nick, film.id, title)
         else:
             reply = '{0}, ничего не выбранно!'.format(nick)
         self.say(room, reply)
