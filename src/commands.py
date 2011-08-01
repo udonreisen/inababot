@@ -103,7 +103,6 @@ class FilmCommand(Command):
                     else:
                         self.say(room, '{0}: неправильный ID!'.format(nick))
         elif argstring == 'clear':
-            film = 
             if self.bot.storage.clearFilm():
                 self.say(room, '{0}: База очищенна.'.format(nick))
             else:
