@@ -159,6 +159,15 @@ class Storage(object):
             return title
         else:
             return False
+    def clearFilm(self):
+        session = Session()
+        films = session.query(Film).filter(True).all()
+        if films is not None:
+            session.delete(films)
+            session.commit()
+            return True
+        else:
+            return False
 #Класс описывающий участника
 class Jid(Base):
     __tablename__ = 'jids'

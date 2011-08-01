@@ -102,6 +102,12 @@ class FilmCommand(Command):
                         self.say(room, '{0}: «{1}» удалён из базы.'.format(nick, film))
                     else:
                         self.say(room, '{0}: неправильный ID!'.format(nick))
+        elif argstring == 'clear':
+            film = 
+            if self.bot.storage.clearFilm():
+                self.say(room, '{0}: База очищенна.'.format(nick))
+            else:
+                self.say(room, '{0}: Ошибка!'.format(nick))
         else:
             self.say(room, self.help().format(nick))
 
@@ -113,7 +119,8 @@ class FilmCommand(Command):
 !film add Название Фильма — добавить фильм;
 !film on ID — добавить фильм с ID в рулетку;
 !film off ID — убрать фильм с ID из рулетки;
-!film rm ID — удалить фильм с ID из базы.'''
+!film rm ID — удалить фильм с ID из базы;
+!film clear — очистить базу.'''
 
 # Возвращает достоверность информации
 class InfaCommand(Command):
