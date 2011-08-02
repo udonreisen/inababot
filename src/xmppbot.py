@@ -96,15 +96,17 @@ class XmppBot:
             if nick != self.myNicks[room]:
                 reply = logic.textHandle(nick, self.myNicks[room], text)
                 if reply: self.sayInMUC(room, reply)
-        if text.startswith(tuple(logic.commands_list)):
-            if text.count(' ') > 0:
+        if text.startswith('!'):
+            if text in logic.commands_list:
+                comm = Thread(target=logic.commands_list[text](self), args=(room, nick))
+            elif text.count(' ') > 0:
                 command = text.split(' ', 1)[0]
                 argstring = text.split(' ', 1)[1]
-                comm = Thread(target=logic.commands_list[command](self), args=(room, nick, argstring))
-                comm.start()
-            elif text in logic.commands_list:
-                comm = Thread(target=logic.commands_list[text](self), args=(room, nick))
-                comm.start()
+                if command in logic.commands_list:
+                    comm = Thread(target=logic.commands_list[command](self), args=(room, nick, argstring))
+                else:
+                    comm = Thread(target=logic.commands_list['!help'](self), args=(room, nick))
+            comm.start()
 
     # Обработка сообщений
     def handleIncomingMessage(self, message):

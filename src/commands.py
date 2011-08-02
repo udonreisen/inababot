@@ -3,7 +3,7 @@
 
 import random
 import time
-from xml.etree import cElementTree
+import hashlib
 
 angry = False
 
