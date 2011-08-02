@@ -144,6 +144,7 @@ class HelpCommand(Command):
     def __call__(self, room, nick, argstring=None):
         reply = '''{0}: Справка.
 !film — работа с базой фильмов, подробности !film help
+!infa — возвращает инфу
 !help — данная справка
 !memb — делает участника постояным
 !part — подсвечивает всех участников в конференци
