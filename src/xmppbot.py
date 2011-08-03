@@ -106,6 +106,8 @@ class XmppBot:
                     comm = Thread(target=logic.commands_list[command](self), args=(room, nick, argstring))
                 else:
                     comm = Thread(target=logic.commands_list['!help'](self), args=(room, nick))
+            else:
+                comm = Thread(target=logic.commands_list['!help'](self), args=(room, nick))
             comm.start()
 
     # Обработка сообщений
