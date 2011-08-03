@@ -163,8 +163,9 @@ class Storage(object):
         session = Session()
         films = session.query(Film).order_by(Film.id)
         if films is not None:
-            session.delete(films)
-            session.commit()
+            for film in films:
+                session.delete(film)
+                session.commit()
             return True
         else:
             return False
