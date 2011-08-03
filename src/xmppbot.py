@@ -28,6 +28,7 @@ class XmppBot:
         self.myNicks = {}
         self.users = {}
         self.online = False
+        self.watch = 0
         self.moderators = {}
         self.commands = logic.commands_list
         self.controls = logic.controls_list
@@ -66,7 +67,7 @@ class XmppBot:
             for string in bannedStrings:
                 if nick.find(string) != -1: isBot += 1
             if isBot > 1:
-                self.kick(nick, 'Да ты же, сука, бот!')
+                self.kick(room, nick, 'Да ты же, сука, бот!')
                 return
             if affiliation in ['owner', 'admin']:
                 self.storage.checkJid(jid, True)
@@ -153,7 +154,7 @@ class XmppBot:
             self.sayInMUC(room, reply)
 
     # Автокик
-    def kick(self, nick, kickreason=None):
+    def kick(self, room, nick, kickreason=None):
         query = cElementTree.Element('{http://jabber.org/protocol/muc#admin}query')
         item = cElementTree.Element('item', {'role':'none', 'nick':nick})
         if kickreason is not None:
@@ -162,5 +163,5 @@ class XmppBot:
             item.append(reason)
         query.append(item)
         iq = self.xmpp.makeIqSet(query)
-        iq['to'] = self.confname
+        iq['to'] = room
         result = iq.send()

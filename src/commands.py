@@ -17,6 +17,9 @@ class Command(object):
     def say(self, room, text):
         self.bot.xmpp.sendMessage(room, text, mtype='groupchat')
 
+    def sayPrivate(self, why, text):
+        self.bot.xmpp.sendMessage(why, text, mtype='chat')
+
     def getNicksInRoom(self, room):
         return list(self.bot.xmpp.plugin['xep_0045'].getRoster(room))
 
@@ -60,7 +63,7 @@ class FilmCommand(Command):
                 reply = '{0}, список фильмов в рулетке: {1}'.format(nick, ', '.join(listFilms))
             else:
                 reply = '{0}, фильмов в рулетке нет.'.format(nick)
-            self.say(room, reply)
+            self.sayPrivate(room + '/' + nick, reply)
         elif argstring.startswith('full'):
             listFilms = []
             for film in list(self.bot.storage.listFilms(False)):
@@ -69,7 +72,7 @@ class FilmCommand(Command):
                 reply = '{0}, весь список фильмов: {1}'.format(nick, ', '.join(listFilms))
             else:
                 reply = '{0}, фильмов в списке нет.'.format(nick)
-            self.say(room, reply)
+            self.sayPrivate(room + '/' + nick, reply)
         elif argstring.startswith('add '):
             if len(argstring) > 4:
                 film = argstring.split(' ', 1)[1]
@@ -87,7 +90,7 @@ class FilmCommand(Command):
                 if len(argstring) > 4:
                     filmID = argstring.split(' ', 1)[1]
             else:
-                self.say(room, self.help().format(nick))
+                self.sayPrivate(room + '/' + nick, self.help().format(nick))
                 return
             if filmID.isdigit():
                 film = self.bot.storage.switchFilm(filmID, onRollete)
@@ -116,7 +119,7 @@ class FilmCommand(Command):
             else:
                 self.say(room, '{0}: Ошибка!'.format(nick))
         else:
-            self.say(room, self.help().format(nick))
+            self.sayPrivate(room + '/' + nick, self.help().format(nick))
 
     def help(self):
         return '''{0}: Использование:
@@ -149,8 +152,9 @@ class HelpCommand(Command):
 !memb — делает участника постояным
 !part — подсвечивает всех участников в конференци
 !ping — pong!
-!roll — рулетка с фильмами'''.format(nick)
-        self.say(room, reply)
+!roll — рулетка с фильмами
+!start — запуск просмотра фильма'''.format(nick)
+        self.sayPrivate(room + '/' + nick, reply)
 
 class MembCommand(Command):
     def __call__(self, room, nick, argstring=None):
@@ -191,3 +195,25 @@ class RollCommand(Command):
         else:
             reply = '{0}, ничего не выбранно!'.format(nick)
         self.say(room, reply)
+        
+class StartCommand(Command):
+    def __call__(self, room, nick, argstring=None):
+        users = sorted(list(self.getNicksInRoom(room)))
+        users.remove(self.bot.myNicks[room])
+        self.say(room,'{0}\n\nВсем внимание, сейчас кино смотреть будем!'.format(', '.join(users)))
+        self.bot.watch += 1
+        time.sleep(10)
+        self.say(room, '3')
+        time.sleep(1)
+        self.say(room, '2')
+        time.sleep(1)
+        self.say(room, '1')
+        time.sleep(1)
+        self.say(room, 'Go! Go! Go!')
+        time.sleep(3480)
+        if self.bot.watch == 1:
+            self.say(room,'{0}\n\nЧерез две минуты антракт!'.format(', '.join(users)))
+            time.sleep(120)
+            self.say(room,'{0}\n\nСтоп!'.format(', '.join(users)))
+        else:
+            self.bot.watch -= 1
