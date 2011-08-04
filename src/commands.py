@@ -53,7 +53,7 @@ class Command(object):
 class FilmCommand(Command):
     def __call__(self,  room, nick, argstring=None):
         if argstring is None or argstring.startswith('help'):
-            self.say(room, self.help().format(nick))
+            self.sayPrivate(room + '/' + nick, self.help().format(nick))
         elif argstring.startswith('list'):
             listFilms = []
             for film in list(self.bot.storage.listFilms(True)):
