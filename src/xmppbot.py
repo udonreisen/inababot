@@ -61,11 +61,12 @@ class XmppBot:
         type = presence['muc']['type']
         roster= self.xmpp.plugin['xep_0045'].getRoster(room)
         self.storage.checkNick(nick)
-        if jid != '':
+        if jid != '' and role == 'visitor':
             bannedStrings = ['_','(',')','0','1','2','3','4','5','6','7','8','9']
             isBot = 0
             for string in bannedStrings:
-                if nick.find(string) != -1: isBot += 1
+                isBot += nick.count(string)
+                isBot += jid.count(string)
             if isBot > 1:
                 self.kick(room, nick, 'Да ты же, сука, бот!')
                 return
