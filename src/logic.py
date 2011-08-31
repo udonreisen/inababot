@@ -17,7 +17,8 @@ commands_list = {'!film' : FilmCommand,
                  '!part' : PartCommand,
                  '!ping' : PingCommand,
                  '!roll' : RollCommand,
-                 '!start': StartCommand
+                 '!start': StartCommand,
+                 '!stop' : StopCommand
 }
 
 admin_commands_list = {

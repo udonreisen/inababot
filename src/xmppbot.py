@@ -28,7 +28,7 @@ class XmppBot:
         self.myNicks = {}
         self.users = {}
         self.online = False
-        self.watch = 0
+        self.watch = False
         self.moderators = {}
         self.commands = logic.commands_list
         self.controls = logic.controls_list

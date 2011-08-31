@@ -198,22 +198,37 @@ class RollCommand(Command):
         
 class StartCommand(Command):
     def __call__(self, room, nick, argstring=None):
+        if self.bot.watch:
+            self.say(room,'{0}: Уже смотрим же! Команда !stop — для отключения.'.format(nick))
+            return
+        if argstring.isdigit():
+            delay = int(argstring)
+            if 10 > delay > 120:
+                self.say(room,'{0}: Не жирновато будет?. Не буду я столько ждать.'.format(nick))
+                return
+            start_reply = 'Смотрим. Перерыв через {0} минут(ы).'.format(delay)
+        else:
+            start_reply = 'Смотрим.'
         users = sorted(list(self.getNicksInRoom(room)))
         users.remove(self.bot.myNicks[room])
-        self.say(room,'{0}\n\nВсем внимание, сейчас кино смотреть будем!'.format(', '.join(users)))
-        self.bot.watch += 1
-        time.sleep(10)
-        self.say(room, '3')
-        time.sleep(1)
-        self.say(room, '2')
-        time.sleep(1)
-        self.say(room, '1')
-        time.sleep(1)
+        self.say(room,'{0}\n\n'.format(', '.join(users)) + start_reply)
+        self.bot.watch = True
+        time.sleep(15)
+        timeout = 5
+        for timer in range(timeout-1):
+            self.say(room, '{0}!'.format(timeout - timer))
+            time.sleep(1)
         self.say(room, 'Go! Go! Go!')
-        time.sleep(3480)
-        if self.bot.watch == 1:
+        if delay is not None:
+            time.sleep((delay-2) * 60)
             self.say(room,'{0}\n\nЧерез две минуты антракт!'.format(', '.join(users)))
             time.sleep(120)
-            self.say(room,'{0}\n\nСтоп!'.format(', '.join(users)))
-        else:
-            self.bot.watch -= 1
+            self.say(room,'{0}\n\nПерерыв!'.format(', '.join(users)))
+        self.bot.watch = False
+
+class StopCommand(Command):
+    def __call__(self, room, nick, argstring=None):
+        self.bot.watch = False
+        users = sorted(list(self.getNicksInRoom(room)))
+        users.remove(self.bot.myNicks[room])
+        self.say(room,'{0}\n\nСтоп, блеать!'.format(', '.join(users)))
