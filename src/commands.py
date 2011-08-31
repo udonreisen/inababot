@@ -201,7 +201,9 @@ class StartCommand(Command):
         if self.bot.watch:
             self.say(room,'{0}: Уже смотрим же! Команда !stop — для отключения.'.format(nick))
             return
-        if argstring.isdigit():
+        if argstring is None:
+            start_reply = 'Смотрим.'
+        elif argstring.isdigit():
             delay = int(argstring)
             if 10 > delay > 120:
                 self.say(room,'{0}: Не жирновато будет?. Не буду я столько ждать.'.format(nick))
