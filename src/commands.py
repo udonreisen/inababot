@@ -211,10 +211,10 @@ class StartCommand(Command):
             start_reply = 'Смотрим.'
         users = sorted(list(self.getNicksInRoom(room)))
         users.remove(self.bot.myNicks[room])
-        self.say(room,'{0}\n\n'.format(', '.join(users)) + start_reply)
+        self.say(room,'{0}\n\n'.format(', '.join(users)) + start_reply + '/nСтарт через 20 секунд.')
         self.bot.watch = True
-        time.sleep(15)
-        timeout = 5
+        time.sleep(20)
+        timeout = 3
         for timer in range(timeout-1):
             self.say(room, '{0}!'.format(timeout - timer))
             time.sleep(1)
