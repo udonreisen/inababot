@@ -217,6 +217,8 @@ class StartCommand(Command):
         self.bot.watch = True
         time.sleep(20)
         timeout = 3
+        if self.bot.watch:
+            return
         for timer in range(timeout-1):
             self.say(room, '{0}!'.format(timeout - timer))
             time.sleep(1)
