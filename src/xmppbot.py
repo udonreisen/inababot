@@ -47,9 +47,9 @@ class XmppBot:
             self.joinMUC(muc.jid, muc.nick)
             self.users[muc.jid] = {}
             self.moderators[muc.jid] = []
-        if not self.online:
-            self.online = True
-            self.hello()
+#        if not self.online:
+        self.online = True
+        self.hello()
 
     # Обработка статусных сообщений
     def handleIncomingGroupPresence(self, presence):
@@ -135,12 +135,106 @@ class XmppBot:
 
     # Приветствие
     def hello(self):
+        welcome_types = ['wa', 'wo', 'aa', 'ao']
+        welcomies = {
+            'wa'      : ['%wel%, %mem%', '%mem%, %wel%', '%wel%, %mem%. %qes%',
+                         '%mem%, %wel%. %qes%'],
+            'wo'      : ['%wel%, %mem%', '%mem%, %wel%', '%wel%, %mem%. %qes%',
+                         '%mem%, %wel%. %qes%'],
+            'aa'      : ['%mem%, %qes%', '%qes%, %mem%',
+                         'Ну что вы, %mem%, %qes%', 'Ну что вы, %qes%, %mem%'],
+            'ao'      : ['%mem%, %qes%', '%qes%, %mem%',
+                         'Ну что вы, %mem%, %qes%', 'Ну что вы, %qes%, %mem%']}
+        moots = ['good', 'neutral', 'bad', 'lulz', 'crazy']
+        members = {
+            'good'   : ['няшечки', 'сырняшки', 'ычаньки'],
+            'neutral': ['конфа', '', 'мальчики и девочки', 'дамы и господа',
+                        'леди и джентельмены', 'братья и сёстры', 'товарищи',
+                        'камрады', 'амиго'],
+            'bad'    : ['троллики', 'дрочеры', 'пацанчики', 'петушки',
+                        'мудаки', 'дурачьё', 'рачки', 'жалкие людишки'],
+            'lulz'   : ['бетманы', 'приборчики', 'дроны и честные аноны',
+                        'юички', 'пацаки', '/iirchat/', 'киночатик']}
+        action_prefixes = ['%act%', 'всё %act%', '%act% всё', 'опять %act%',
+            '%act% опять', '%act% снова', '%act% снова', 'почему %act%',
+            'почему не %act%', 'сколько уже %act%', 'зачем не %act%']
+        actions = {
+            'good'   : ['няшитесь', 'каваитесь', 'трётесь щёчками',
+                        'няшите Ирочку'],
+            'neutral': ['молчите', 'ругаетесь', 'спите', 'пъёте чай', 'пьёте пиво',
+                        'смотрите кинцо'],
+            'bad'    : ['ругаетесь', 'дрочите', 'страдаете хернёй', 'ракуете',
+                        'хиккуете'],
+            'lulz'   : ['махаете приборчиком', 'ололокаете', 'угораете по хардкору']}
+        offer_prefixes = ['%off%', '%off% уже', 'давайте, %off% уже',
+                          'будте няшками, %off%, блеать']
+        offers = {
+            'good'   : ['поняштесь', 'покавайтесь', 'потритесь щёчками',
+                        'поняште Ирочку'],
+            'neutral': ['помолчите', 'поругаетесь', 'поспите', 'попейте чай',
+                        'попейте пиво'],
+            'bad'    : ['поругайтесь', 'подрочите', 'пострадайте хернёй',
+                        'поракуете', 'похиккуйте'],
+            'lulz'   : ['помахайте приборчиком', 'поололокаете', 
+                        'побегайте по конфочкам', 'поугорайте по хардкору',
+                        'сделайте два раза «Ку!»']}
+        greetings = {
+            'good'   : ['приветик', 'няшек вам', 'няшного'],
+            'neutral': ['привет', 'доброго', 'здравствуйте', 'мир вам', 'оххайо',
+                        'ни хао', 'хай', 'шалом', 'гамарджоба', '%daytime%'],
+            'bad'    : ['вечер в хату', 'бодрячком'],
+            'lulz'   : ['сапы', 'ололо', 'ку']}
+        smiles = {
+            'good'   : ['', '^_^', ':3'],
+            'neutral': [''],
+            'bad'    : ['', '.\_/.', ':rage:'],
+            'lulz'   : ['', ':cf:', ':wagan:']}
         time.sleep(5)
-        members = ['бетманы', 'няшки', 'омичи']
-        asks = ['всё няшитесь', 'всё ругаетесь', 'всё спите','всё упарываетесь']
         for room in self.xmpp.plugin['xep_0045'].get_joined_rooms():
-            text = 'Ну что вы, {0}, {1}?'.format(random.choice(members), random.choice(asks))
-            self.sayInMUC(room, text)
+            type = random.choice(welcome_types)
+            welcome = random.choice(welcomies[type])
+            mootx =  random.choice(moots)
+            if mootx == 'crazy':
+                moots.remove('crazy')
+                moot = lambda: random.choice(moots)
+            else:
+                moot = lambda: mootx
+            member = random.choice(members[moot()])
+            welcome = welcome.replace('%mem%', member)
+            if type in ['wa', 'aa']:
+                punctuation = '?'
+                action_prefix = random.choice(action_prefixes)
+                action = random.choice(actions[moot()])
+                question = action_prefix.replace('%act%', action)
+            else:
+                punctuation = random.choice(['.', '!'])
+                offer_prefix = random.choice(offer_prefixes)
+                offer = random.choice(offers[moot()])
+                question = offer_prefix.replace('%off%', offer)
+            if type in ['wa', 'wo']:
+                question = question.capitalize()
+                greeting = random.choice(greetings[moot()])
+                if greeting == '%daytime%':
+                    hours = int(time.strftime('%H'))
+                    if hours > 4 and hours <= 12:
+                        greeting = 'доброе утро'
+                    elif hours > 12 and hours <= 18:
+                        greeting = 'добрый день'
+                    elif hours > 18 and hours <= 23:
+                        greeting = 'добрый вечер'
+                    else:
+                        greeting = 'доброй ночи'
+                welcome = welcome.replace('%wel%', greeting)
+            if type in ['wa', 'wo']:
+                welcome = welcome.capitalize()
+                welcome = welcome.replace('%qes%', question)
+            else:
+                welcome = welcome.replace('%qes%', question)
+                welcome = welcome.capitalize()
+            smile = random.choice(smiles[moot()])
+            welcome = welcome + punctuation + ' ' + smile
+            welcome = welcome.strip()
+            self.sayInMUC(room, welcome)
 
     # Даёт голос гостям
     def autoVoice(self, room, nick):
