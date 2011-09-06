@@ -142,9 +142,9 @@ class XmppBot:
             'wo'      : ['%wel%, %mem%', '%mem%, %wel%', '%wel%, %mem%. %qes%',
                          '%mem%, %wel%. %qes%'],
             'aa'      : ['%mem%, %qes%', '%qes%, %mem%',
-                         'Ну что вы, %mem%, %qes%', 'Ну что вы, %qes%, %mem%'],
+                         'Ну что вы, %mem%, %qes%'],
             'ao'      : ['%mem%, %qes%', '%qes%, %mem%',
-                         'Ну что вы, %mem%, %qes%', 'Ну что вы, %qes%, %mem%']}
+                         'Ну что вы, %mem%, %qes%']}
         moots = ['good', 'neutral', 'bad', 'lulz', 'crazy']
         members = {
             'good'   : ['няшечки', 'сырняшки', 'ычаньки'],
