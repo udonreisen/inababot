@@ -49,7 +49,7 @@ class XmppBot:
             self.moderators[muc.jid] = []
 #        if not self.online:
         self.online = True
-        self.hello()
+#        self.hello()
 
     # Обработка статусных сообщений
     def handleIncomingGroupPresence(self, presence):
@@ -61,15 +61,16 @@ class XmppBot:
         type = presence['muc']['type']
         roster= self.xmpp.plugin['xep_0045'].getRoster(room)
         self.storage.checkNick(nick)
-        if jid != '' and role == 'visitor':
-            bannedStrings = ['_','(',')','0','1','2','3','4','5','6','7','8','9']
-            isBot = 0
-            for string in bannedStrings:
-                isBot += nick.count(string)
-                isBot += jid.count(string)
-            if isBot > 1:
-                self.kick(room, nick, 'Да ты же, сука, бот!')
-                return
+        if jid != '':
+            if role == 'visitor':
+                bannedStrings = ['_','(',')','0','1','2','3','4','5','6','7','8','9']
+                isBot = 0
+                for string in bannedStrings:
+                    isBot += nick.count(string)
+                    isBot += jid.count(string)
+                if isBot > 1:
+                    self.kick(room, nick, 'Да ты же, сука, бот!')
+                    return
             if affiliation in ['owner', 'admin']:
                 self.storage.checkJid(jid, True)
             elif affiliation == 'member':
