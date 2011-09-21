@@ -50,3 +50,10 @@ class MUCControl(Control):
 Доступны только администраторам:
 muc add room@conference.jabber.srv Ник — добавить конференцию
 muc join ID — подключится к конференции'''
+
+
+# Команда подключения бота к конференции
+class SayControl(Control):
+    def __call__(self, user, argstring=None):
+        if argstring:
+            self.bot.sayInMUC(user, argstring)

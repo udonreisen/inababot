@@ -49,7 +49,7 @@ class XmppBot:
             self.moderators[muc.jid] = []
 #        if not self.online:
         self.online = True
-#        self.hello()
+        self.hello()
 
     # Обработка статусных сообщений
     def handleIncomingGroupPresence(self, presence):
@@ -117,14 +117,20 @@ class XmppBot:
     def handleIncomingMessage(self, message):
         jid = message['from'].bare
         text = message['body']
-        user = self.storage.getJid(jid)
-        if user is not None:
+        if jid in list(self.xmpp.plugin['xep_0045'].get_joined_rooms()):
+            if text.startswith(tuple(logic.controls_pm_list)):
+                if text.count(' ') > 0:
+                    command = text.split(' ', 1)
+                    logic.controls_pm_list[command[0]](self)(jid, command[1])
+                elif text in logic.controls_list:
+                    logic.controls_pm_list[text](self)(jid)
+        else:
             if text.startswith(tuple(logic.controls_list)):
                 if text.count(' ') > 0:
                     command = text.split(' ', 1)
-                    logic.controls_list[command[0]](self)(user, command[1])
+                    logic.controls_list[command[0]](self)(jid, command[1])
                 elif text in logic.controls_list:
-                    logic.controls_list[text](self)(user)
+                    logic.controls_list[text](self)(jid)
 
     # Подключение к конференции
     def joinMUC(self, room, nick):
@@ -154,7 +160,7 @@ class XmppBot:
                  'crazy']
         members = {
             'good'   : ['няшечки', 'сырняшки', 'ычаньки'],
-            'neutral': ['конфа', '', 'мальчики и девочки', 'дамы и господа',
+            'neutral': ['конфа', 'мальчики и девочки', 'дамы и господа',
                         'леди и джентельмены', 'братья и сёстры', 'товарищи',
                         'камрады', 'амиго'],
             'bad'    : ['троллики', 'дрочеры', 'пацанчики', 'петушки',

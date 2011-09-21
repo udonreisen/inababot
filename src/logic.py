@@ -21,6 +21,10 @@ commands_list = {'!film' : FilmCommand,
                  '!stop' : StopCommand
 }
 
+controls_pm_list = {
+    'say'        : SayControl,
+}
+
 admin_commands_list = {
 #    '!ban'      : BanCommand,
 #    '!devoice'  : DevoiceCommand,
