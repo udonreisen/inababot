@@ -216,8 +216,6 @@ class StartCommand(Command):
         self.say(room,'{0}\n\n'.format(', '.join(users)) + start_reply + '/nСтарт через 20 секунд.')
         time.sleep(20)
         timeout = 3
-        if self.bot.watch:
-            return
         self.bot.watch = True
         for timer in range(timeout-1):
             self.say(room, '{0}!'.format(timeout - timer))
