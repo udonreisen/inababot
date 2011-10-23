@@ -146,14 +146,13 @@ class InfaCommand(Command):
 class HelpCommand(Command):
     def __call__(self, room, nick, argstring=None):
         reply = '''{0}: Справка.
-!film — работа с базой фильмов, подробности !film help
 !infa — возвращает инфу
 !help — данная справка
 !memb — делает участника постояным
 !part — подсвечивает всех участников в конференци
 !ping — pong!
-!roll — рулетка с фильмами
-!start — запуск просмотра фильма'''.format(nick)
+!start — запуск просмотра фильма
+!stop — остановка просмотра'''.format(nick)
         self.sayPrivate(room + '/' + nick, reply)
 
 class MembCommand(Command):
@@ -195,7 +194,7 @@ class RollCommand(Command):
         else:
             reply = '{0}, ничего не выбранно!'.format(nick)
         self.say(room, reply)
-        
+
 class StartCommand(Command):
     def __call__(self, room, nick, argstring=None):
         if self.bot.watch:
@@ -206,18 +205,18 @@ class StartCommand(Command):
         elif argstring.isdigit():
             delay = int(argstring)
             if 10 > delay > 120:
-                self.say(room,'{0}: Не жирновато будет?. Не буду я столько ждать.'.format(nick))
+                self.say(room,'{0}: Не жирновато будет?. Не буду столько ждать.'.format(nick))
                 return
             start_reply = 'Смотрим. Перерыв через {0} минут(ы).'.format(delay)
         else:
             start_reply = 'Смотрим.'
         users = sorted(list(self.getNicksInRoom(room)))
         users.remove(self.bot.myNicks[room])
-        self.say(room,'{0}\n\n'.format(', '.join(users)) + start_reply + '/nСтарт через 20 секунд.')
+        self.say(room,'{0}\n\n'.format(', '.join(users)) + start_reply + '\nСтарт через 20 секунд.')
         time.sleep(20)
         timeout = 3
         self.bot.watch = True
-        for timer in range(timeout-1):
+        for timer in range(timeout):
             self.say(room, '{0}!'.format(timeout - timer))
             time.sleep(1)
         self.say(room, 'Go! Go! Go!')

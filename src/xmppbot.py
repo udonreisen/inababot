@@ -28,7 +28,9 @@ class XmppBot:
         self.myNicks = {}
         self.users = {}
         self.online = False
+        self.guard = True
         self.watch = False
+        self.kicked = []
         self.moderators = {}
         self.commands = logic.commands_list
         self.controls = logic.controls_list
@@ -58,19 +60,23 @@ class XmppBot:
         affiliation = presence['muc']['affiliation']
         role = presence['muc']['role']
         jid = presence['muc']['jid'].bare
+        login = jid.split('@')[0]
         type = presence['muc']['type']
         roster= self.xmpp.plugin['xep_0045'].getRoster(room)
         self.storage.checkNick(nick)
         if jid != '':
-            if role == 'visitor':
+            if role == 'visitor' and self.guard:
                 bannedStrings = ['_','(',')','0','1','2','3','4','5','6','7','8','9']
                 isBot = 0
                 for string in bannedStrings:
                     isBot += nick.count(string)
-                    isBot += jid.count(string)
-                if isBot > 1:
+                    isBot += login.count(string)
+                if isBot > 1 and not jid in self.kicked:
                     self.kick(room, nick, 'Да ты же, сука, бот!')
+                    self.kicked.append(jid)
                     return
+                elif jid in self.kicked:
+                    self.kicked.remove(jid)
             if affiliation in ['owner', 'admin']:
                 self.storage.checkJid(jid, True)
             elif affiliation == 'member':
@@ -155,7 +161,7 @@ class XmppBot:
         moots = [
                  'good',
                  'neutral',
-#                 'bad',
+                 'bad',
                  'lulz',
                  'crazy']
         members = {
@@ -163,8 +169,7 @@ class XmppBot:
             'neutral': ['конфа', 'мальчики и девочки', 'дамы и господа',
                         'леди и джентельмены', 'братья и сёстры', 'товарищи',
                         'камрады', 'амиго'],
-            'bad'    : ['троллики', 'дрочеры', 'пацанчики', 'петушки',
-                        'мудаки', 'дурачьё', 'рачки', 'жалкие людишки'],
+            'bad'    : ['тролли', 'петушки', 'дурачьё', 'рачки', 'жалкие людишки'],
             'lulz'   : ['бетманы', 'приборчики', 'дроны и честные аноны',
                         'юички', 'пацаки', '/iirchat/', 'киночатик']}
         action_prefixes = ['%act%', 'всё %act%', '%act% всё', 'опять %act%',
@@ -173,10 +178,9 @@ class XmppBot:
         actions = {
             'good'   : ['няшитесь', 'каваитесь', 'трётесь щёчками',
                         'няшите Ирочку'],
-            'neutral': ['молчите', 'ругаетесь', 'спите', 'пъёте чай', 'пьёте пиво',
+            'neutral': ['молчите', 'ругаетесь', 'спите', 'пьёте чай', 'пьёте пиво',
                         'смотрите кинцо'],
-            'bad'    : ['ругаетесь', 'дрочите', 'страдаете хернёй', 'ракуете',
-                        'хиккуете'],
+            'bad'    : ['ругаетесь', 'дрочите', 'ракуете', 'хиккуете'],
             'lulz'   : ['махаете приборчиком', 'ололокаете', 'угораете по хардкору']}
         offer_prefixes = ['%off%', '%off% уже', 'давайте, %off% уже',
                           'будьте няшками, %off%, блеать']
@@ -185,8 +189,7 @@ class XmppBot:
                         'поняшьте Ирочку'],
             'neutral': ['помолчите', 'поругаетесь', 'поспите', 'попейте чай',
                         'попейте пиво'],
-            'bad'    : ['поругайтесь', 'подрочите', 'пострадайте хернёй',
-                        'поракуете', 'похиккуйте'],
+            'bad'    : ['поругайтесь', 'подрочите', 'поракуете', 'похиккуйте'],
             'lulz'   : ['помахайте приборчиком', 'поололокаете', 
                         'побегайте по конфочкам', 'поугорайте по хардкору',
                         'сделайте два раза «Ку!»']}
@@ -194,7 +197,7 @@ class XmppBot:
             'good'   : ['приветик', 'няшек вам', 'няшного'],
             'neutral': ['привет', 'доброго', 'здравствуйте', 'мир вам', 'оххайо',
                         'ни хао', 'хай', 'шалом', 'гамарджоба', '%daytime%'],
-            'bad'    : ['вечер в хату', 'бодрячком'],
+            'bad'    : ['бодрячком'],
             'lulz'   : ['сапы', 'ололо', 'ку']}
         smiles = {
             'good'   : ['', '^_^', ':3'],
