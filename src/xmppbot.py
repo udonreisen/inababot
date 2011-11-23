@@ -100,7 +100,10 @@ class XmppBot:
         text = message['body']
         print('{0}/{1}: {2}'.format(room, nick, text))
         if nick:
-            jid = self.users[room][nick]['jid']
+            try:
+                jid = self.users[room][nick]['jid']
+            except:
+                jid = ''
             self.storage.addMessage(room, jid, nick, text)
             if nick != self.myNicks[room]:
                 reply = logic.textHandle(nick, self.myNicks[room], text)
